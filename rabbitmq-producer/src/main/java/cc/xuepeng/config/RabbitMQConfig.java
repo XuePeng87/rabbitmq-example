@@ -3,9 +3,12 @@ package cc.xuepeng.config;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.context.annotation.Bean;
 
 import javax.annotation.Resource;
 
@@ -46,6 +49,17 @@ public class RabbitMQConfig {
         });
         return rabbitTemplate;
     }
+
+    /**
+     * 声明Direct交换机 支持持久化.
+     *
+     * @return the exchange
+     */
+    @Bean("directExchange")
+    public Exchange directExchange() {
+        return ExchangeBuilder.directExchange("DIRECT_EXCHANGE").durable(false).build();
+    }
+
 
 
 }
