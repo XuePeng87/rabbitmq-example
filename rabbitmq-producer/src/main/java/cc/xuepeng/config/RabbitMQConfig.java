@@ -24,6 +24,18 @@ public class RabbitMQConfig {
      */
     @Resource
     private RabbitTemplate rabbitTemplate;
+    /**
+     * 死信交换器名称。
+     */
+    private static final String DEAD_LETTER_EXCHANGE_NAME = "DEAD_LETTER_EXCHANGE";
+    /**
+     * 死信队列名称。
+     */
+    private static final String DEAD_LETTER_QUEUE_NAME = "DEAD_LETTER_QUEUE";
+    /**
+     * 死信队列路由键。
+     */
+    private static final String DEAD_LETTER_ROUTING_KEY_NAME = "DEAD_LETTER_ROUTING_KEY";
 
     /**
      * 定制AmqpTemplate对象。
@@ -65,7 +77,34 @@ public class RabbitMQConfig {
      */
     @Bean("directExchange")
     public Exchange directExchange() {
-        return ExchangeBuilder.directExchange("DIRECT_EXCHANGE").durable(false).build();
+        return ExchangeBuilder.directExchange("DIRECT_EXCHANGE")
+                .durable(false)
+                .withArgument("alternate-exchange", "UN_ROUTE_EXCHANGE")
+                .build();
+    }
+
+    /**
+     * 声明备用交换器。
+     *
+     * @return Exchange对象。
+     */
+    @Bean("unRouteExchange")
+    public Exchange unRouteExchange() {
+        return ExchangeBuilder.fanoutExchange("UN_ROUTE_EXCHANGE")
+                .durable(false)
+                .build();
+    }
+
+    /**
+     * 声明死信交换机。
+     *
+     * @return Exchange对象。
+     */
+    @Bean("deadLetterExchange")
+    public Exchange deadLetterExchange() {
+        return ExchangeBuilder.fanoutExchange(DEAD_LETTER_EXCHANGE_NAME)
+                .durable(false)
+                .build();
     }
 
     /**
@@ -75,7 +114,30 @@ public class RabbitMQConfig {
      */
     @Bean("directQueue")
     public Queue directQueue() {
-        return QueueBuilder.durable("DIRECT_QUEUE").build();
+        return QueueBuilder.durable("DIRECT_QUEUE")
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE_NAME)
+                .withArgument("x-dead-letter-routing-key", DEAD_LETTER_ROUTING_KEY_NAME)
+                .build();
+    }
+
+    /**
+     * 备用队列。
+     *
+     * @return Queue对象。
+     */
+    @Bean("unRouteQueue")
+    public Queue unRouteQueue() {
+        return QueueBuilder.durable("UN_ROUTE_QUEUE").build();
+    }
+
+    /**
+     * 声明死信队列。
+     *
+     * @return Queue对象。
+     */
+    @Bean("deadLetterQueue")
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(DEAD_LETTER_QUEUE_NAME).build();
     }
 
     /**
@@ -89,6 +151,32 @@ public class RabbitMQConfig {
     public Binding directBinding(@Qualifier("directQueue") Queue queue,
                                  @Qualifier("directExchange") Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with("DIRECT_ROUTING_KEY").noargs();
+    }
+
+    /**
+     * 绑定备用交换器与队列。
+     *
+     * @param queue    队列。
+     * @param exchange 交换器。
+     * @return Binding对象。
+     */
+    @Bean
+    public Binding unRouteBinding(@Qualifier("unRouteQueue") Queue queue,
+                                  @Qualifier("unRouteExchange") Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("UN_ROUTE_ROUTING_KEY").noargs();
+    }
+
+    /**
+     * 绑定死信交换器与队列。
+     *
+     * @param queue    死信队列。
+     * @param exchange 死信交换器。
+     * @return Binding对象。
+     */
+    @Bean
+    public Binding deadLetterBinding(@Qualifier("deadLetterQueue") Queue queue,
+                                     @Qualifier("deadLetterExchange") Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(DEAD_LETTER_ROUTING_KEY_NAME).noargs();
     }
 
 }
