@@ -15,8 +15,18 @@ public class TestRabbitMQ {
     private MessageProducer messageProducer;
 
     @Test
-    public void testSend() {
-        messageProducer.direct("hello world");
+    public void testDirect() {
+        messageProducer.direct("{}");
+    }
+
+    @Test
+    public void testDirectNotExistQueue() {
+        messageProducer.directNotExistQueue("{}");
+    }
+
+    @Test
+    public void testDirectNotExistExchangeAndQueue() {
+        messageProducer.directNotExistExchangeAndQueue("{}");
     }
 
 }
