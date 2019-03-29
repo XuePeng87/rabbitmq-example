@@ -3,6 +3,7 @@ package cc.xuepeng.service;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.UUID;
@@ -51,6 +52,19 @@ public class MessageProducer {
     public void directNotExistExchangeAndQueue(String message) {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
         rabbitTemplate.convertAndSend("DIRECT_EXCHANGE_NOT_EXIST", "DIRECT_ROUTING_KEY_NOT_EXIST", message, correlationData);
+    }
+
+    /**
+     * 在事务模式下，发送direct消息。
+     * <p>
+     * 第一次发送，消息可以正常路由到队列。
+     * 第二次发送，消息不能路由到队列。
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void directOnTransaction(String message) {
+        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
+        rabbitTemplate.convertAndSend("DIRECT_TRANSACTION_EXCHANGE", "DIRECT_TRANSACTION_ROUTING_KEY", message, correlationData);
+        rabbitTemplate.convertAndSend("DIRECT_TRANSACTION_EXCHANGE_NOT_EXIST", "DIRECT_TRANSACTION_ROUTING_KEY_NOT_EXIST", message, correlationData);
     }
 
 }

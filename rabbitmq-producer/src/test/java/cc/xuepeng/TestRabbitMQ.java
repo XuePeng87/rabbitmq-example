@@ -48,4 +48,14 @@ public class TestRabbitMQ {
         messageProducer.directNotExistExchangeAndQueue("{}");
     }
 
+    /**
+     * 在事务模式下，发送direct消息。
+     * 第一次发送，消息可以正常路由到队列。
+     * 第二次发送，消息不能路由到队列。
+     */
+    @Test
+    public void testDirectOnTransaction() {
+        messageProducer.directOnTransaction("{}");
+    }
+
 }

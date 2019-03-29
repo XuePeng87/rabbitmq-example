@@ -7,5 +7,6 @@ spring:
     password: guest
     virtual-host: /
     publisher-returns: true
-    publisher-confirms: true
+    #publisher-confirms: true
+    publisher-confirms: false # 测试事务
     connection-timeout: 5000ms
