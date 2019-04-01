@@ -55,7 +55,7 @@ public class RabbitMQConfig {
         rabbitTemplate.setMandatory(true);
         rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
             String correlationId = message.getMessageProperties().getCorrelationId();
-            log.warn("setReturnCallback -> 消息 {} 发送失败，应答码：{}，原因：{}，交换器: {}，路由键：{}",
+            log.warn("ReturnCallback -> 消息 {} 发送失败，应答码：{}，原因：{}，交换器: {}，路由键：{}",
                     correlationId,
                     replyCode,
                     replyText,
@@ -63,15 +63,15 @@ public class RabbitMQConfig {
                     routingKey);
         });
         // 设置消息发布确认功能，需要在yml中配置：publisher-confirms: true
-//        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
-//            if (ack) {
-//                log.info("setConfirmCallback -> 消息发布到交换器成功，id：{}", correlationData);
-//            } else {
-//                log.warn("setConfirmCallback -> 消息发布到交换器失败，错误原因为：{}", cause);
-//            }
-//        });
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            if (ack) {
+                log.info("ConfirmCallback -> 消息发布到交换器成功，id：{}", correlationData);
+            } else {
+                log.warn("ConfirmCallback -> 消息发布到交换器失败，错误原因为：{}", cause);
+            }
+        });
         // 开启事务模式，需要在yml中配置：publisher-confirms: false
-        rabbitTemplate.setChannelTransacted(true);
+        // rabbitTemplate.setChannelTransacted(true);
         return rabbitTemplate;
     }
 

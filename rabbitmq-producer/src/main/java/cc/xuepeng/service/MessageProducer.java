@@ -1,5 +1,6 @@
 package cc.xuepeng.service;
 
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,23 @@ public class MessageProducer {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
         rabbitTemplate.convertAndSend("DIRECT_TRANSACTION_EXCHANGE", "DIRECT_TRANSACTION_ROUTING_KEY", message, correlationData);
         rabbitTemplate.convertAndSend("DIRECT_TRANSACTION_EXCHANGE_NOT_EXIST", "DIRECT_TRANSACTION_ROUTING_KEY_NOT_EXIST", message, correlationData);
+    }
+
+    /**
+     * 发送direct非持久化消息。
+     * RabbitTemplate默认采用消息持久化存储。
+     *
+     * @param message 消息内容。
+     */
+    public void directNonPersistent(String message) {
+        rabbitTemplate.convertAndSend("DIRECT_EXCHANGE",
+                "DIRECT_ROUTING_KEY",
+                message, msg -> {
+                    msg.getMessageProperties().setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT);
+                    msg.getMessageProperties().setCorrelationId(UUID.randomUUID().toString());
+                    return msg;
+                }
+        );
     }
 
 }

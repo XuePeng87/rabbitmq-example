@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class TestRabbitMQ {
-
+    private String password;
     /**
      * 消息生产者服务。
      */
@@ -27,6 +27,7 @@ public class TestRabbitMQ {
      */
     @Test
     public void testDirect() {
+        password = "1";
         messageProducer.direct("{}");
     }
 
@@ -56,6 +57,11 @@ public class TestRabbitMQ {
     @Test
     public void testDirectOnTransaction() {
         messageProducer.directOnTransaction("{}");
+    }
+
+    @Test
+    public void testDirectNonPersistent() {
+        messageProducer.directNonPersistent("{}");
     }
 
 }
