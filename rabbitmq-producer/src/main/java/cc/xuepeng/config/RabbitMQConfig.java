@@ -5,7 +5,6 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.transaction.RabbitTransactionManager;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +48,6 @@ public class RabbitMQConfig {
     @Bean
     public AmqpTemplate amqpTemplate() {
         // 设置消息转换器为Jackson
-        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         rabbitTemplate.setEncoding("UTF-8");
         // 设置不接受不可路由的消息，需要在yml中配置：publisher-returns: true
         rabbitTemplate.setMandatory(true);

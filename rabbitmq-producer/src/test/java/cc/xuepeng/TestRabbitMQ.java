@@ -27,8 +27,7 @@ public class TestRabbitMQ {
      */
     @Test
     public void testDirect() {
-        password = "1";
-        messageProducer.direct("{}");
+        messageProducer.direct("reject-requeue");
     }
 
     /**

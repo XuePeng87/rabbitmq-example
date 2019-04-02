@@ -1,0 +1,13 @@
+spring:
+  #消息队列配置
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 5000ms
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1000
