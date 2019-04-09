@@ -61,7 +61,7 @@ public class MessageProducer {
      * 第一次发送，消息可以正常路由到队列。
      * 第二次发送，消息不能路由到队列。
      */
-    @Transactional(rollbackFor = Exception.class)
+     @Transactional(rollbackFor = Exception.class)
     public void directOnTransaction(String message) {
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
         rabbitTemplate.convertAndSend("DIRECT_TRANSACTION_EXCHANGE", "DIRECT_TRANSACTION_ROUTING_KEY", message, correlationData);
